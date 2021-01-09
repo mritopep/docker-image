@@ -1,0 +1,13 @@
+requests
+dicom2nifti
+zipfile
+google-api-python-client
+google-auth-httplib2
+google-auth-oauthlib
+nibabel==2.4.0
+nilearn
+numpy
+scikit-learn
+scipy
+six==1.12.0
+sklearn==0.0
