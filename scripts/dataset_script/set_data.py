@@ -62,7 +62,7 @@ def make_dir():
 def download_data(name):  
     downloaded_files=[]
     files=get_files(name)
-    files=files[3:4]
+    files=files[:1]
     for fs in files:
         file_id=fs['id']
         file_path=DOWNLOAD+fs['name']

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/work/miniconda/bin/python
 
 import SimpleITK as sitk
 import os

@@ -5,16 +5,19 @@ curr_path = str(os.path.dirname(os.path.abspath(__file__))).replace("/scripts/pr
 preprocessed_data=str(os.path.dirname(os.path.abspath(__file__))).replace("/scripts/preprocess_script","/preprocesed_data/DATA")
 
 def image_registration(pet_image,mri_image):
-    os.system(f"python image_registation {mri_image} {pet_image}")
+    os.system(f"image_reg.py {mri_image} {pet_image}")
 
-def intensity_normalization():
-    pass
+def intensity_normalization(input_dir,output_dir):
+    os.system(f"fcm-normalize -i {input_dir}  -o {output_dir}")
 
-def skull_strip():
-    pass
+def skull_strip(input_image,output_dir):
+    os.system(f"skull_strip.py -i {input_image} -o output {output_dir}")
 
-def bias_correction():
-    pass
+def bias_correction(input_image,output_image):
+    os.system(f"bais_field_correction.py {input_image} {output_image}")
+
+def petpvc(input_image,output_image):
+    os.system(f"petpvc -i {input_image} -o {output_image}")
 
 def get_folder_names(dataset):
     return os.listdir(f"{curr_path}/{dataset}/")

@@ -47,11 +47,6 @@ COPY scripts/dataset_script/tokens/ $SCRIPT/dataset_script/tokens
 COPY scripts/preprocess_script/ $SCRIPT/preprocess_script/
 COPY scripts/requirements.txt $SCRIPT/
 
-#Making sudo possible
-RUN whoami
-SHELL ["/bin/sh", "-c"]
-RUN groupadd -g 1000 AB_DOCKER_SETUP_GROUP
-
 #-------------------------------------------------------------------------------
 # PYTHON
 #-------------------------------------------------------------------------------
@@ -92,8 +87,8 @@ RUN \
     cd ANTS-build && \
     make install 2>&1 | tee install.log
 RUN \
-    echo "export ANTSPATH=$SOFT/ants/build/bin" >> $BASHRC && \
-    echo "export PATH=$PATH:ANTSPATH" >> $BASHRC
+    export ANTSPATH=$SOFT/ants/install/bin && \
+    export PATH=$PATH:$ANTSPATH
 
 #-------------------------------------------------------------------------------
 # NIFTYREG 
@@ -113,9 +108,9 @@ RUN \
     make -j $N_CPUS 2>&1 | tee build.log  && \
     make install 2>&1 | tee install.log
 RUN \
-    echo "export NREG=$SOFT/nifty_reg/build/bin" >> $BASHRC && \
-    echo "export PATH=$PATH:NREG" >> $BASHRC && \
-    echo "export LD_LIBRARY_PATH={NREG}/lib" >> $BASHRC
+    export NIFTYREG=$SOFT/nifty_reg/install/bin && \
+    export PATH=$PATH:$NIFTYREG && \
+    export LD_LIBRARY_PATH=$SOFT/nifty_reg/install/lib
 
 #-------------------------------------------------------------------------------
 # PETPVC
@@ -133,8 +128,8 @@ RUN \
   -c aramislab petpvc
 
 RUN \
-    echo "export miniconda=$HOME/miniconda/bin" >> $BASHRC && \
-    echo "export PATH=$PATH:miniconda" >> $BASHRC
+    export MINICONDA=$HOME/miniconda/bin && \
+    export PATH=$PATH:$MINICONDA
 
 # ENV PETPVC_GIT=https://github.com/UCL/PETPVC.git
 # WORKDIR $SOFT
@@ -161,22 +156,27 @@ RUN \
 ENV STRIP_GIT=https://github.com/JanaLipkova/s3.git
 WORKDIR $SOFT
 RUN \
-    git clone ${STRIP_GIT} skull_strip
+    git clone ${STRIP_GIT} skull_strip && \
+    cd skull_strip && \
+    pip install -r requirements.txt
+COPY scripts/soft/skull_strip.py $SOFT/skull_strip/
+RUN chmod +x $SOFT/skull_strip/skull_strip.py
 RUN \
-    echo "export STRIP_PATH=$SOFT/skull_strip" >> $BASHRC && \
-    echo "export PATH=$PATH:STRIP_PATH" >> $BASHRC
-
+    export SKULL_STRIP_PATH=$SOFT/skull_strip && \
+    export PATH=$PATH:$SKULL_STRIP_PATH
 #-------------------------------------------------------------------------------
 # INTENSITY NORMALIZATION
 #-------------------------------------------------------------------------------
 ENV NORMALIZATION_GIT=https://github.com/jcreinhold/intensity-normalization
 WORKDIR $SOFT
 RUN \
-    git clone ${NORMALIZATION_GIT} intensity_normailzation
+    git clone ${NORMALIZATION_GIT} intensity_normailzation && \
+    cd intensity_normailzation && \
+    python setup.py install && \
+    pip install -r requirements.txt
 RUN \
-    echo "export NORMALIZATION_PATH=$SOFT/intensity_normailzation" >> $BASHRC && \
-    echo "export PATH=$PATH:$NORMALIZATION_PATH" >> $BASHRC
-
+    export NORMALIZATION_PATH=$SOFT/intensity_normailzation && \
+    export PATH=$PATH:$NORMALIZATION_PATH
 #-------------------------------------------------------------------------------
 # BIAS FIELD CORRECTION
 #-------------------------------------------------------------------------------
@@ -184,10 +184,11 @@ WORKDIR $SOFT
 RUN \
     mkdir bias_correction
 COPY scripts/soft/bias_field_correction.py $SOFT/bias_correction/
+USER root
+RUN chmod +x $SOFT/bias_correction/bias_field_correction.py
 RUN \
-    echo "export BIAS_CORRECTION_PATH=$SOFT/bias_correction" >> $BASHRC && \
-    echo "export PATH=$PATH:$BIAS_CORRECTION_PATH" >> $BASHRC
-
+    export BIAS_CORRECTION_PATH=$SOFT/bias_correction && \
+    export PATH=$PATH:$BIAS_CORRECTION_PATH
 #-------------------------------------------------------------------------------
 # IMAGE REGISTRATION
 #-------------------------------------------------------------------------------
@@ -195,10 +196,11 @@ WORKDIR $SOFT
 RUN \
     mkdir image_registration
 COPY scripts/soft/image_rgr.py $SOFT/image_registration/
+USER root
+RUN chmod +x $SOFT/image_registration/image_rgr.py
 RUN \
-    echo "export IMAGE_REG_PATH=$SOFT/image_registration" >> $BASHRC && \
-    echo "export PATH=$PATH:$IMAGE_REG_PATH" >> $BASHRC
-    
+    export IMAGE_REG_PATH=$SOFT/image_registration && \
+    export PATH=$PATH:$IMAGE_REG_PATH
 #-------------------------------------------------------------------------------
 # DATASET
 #-------------------------------------------------------------------------------
@@ -206,10 +208,6 @@ WORKDIR $SCRIPT
 RUN pip install -r requirements.txt && \
     pip install -U six && \
     pip install --upgrade --pre SimpleITK --find-links https://github.com/SimpleITK/SimpleITK/releases/tag/latest
-
-RUN ln -snf /bin/bash /bin/sh
-
-RUN source $BASHRC
 
 CMD ["bash"]
 

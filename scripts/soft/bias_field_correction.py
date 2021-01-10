@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/work/miniconda/bin/python
 
 from __future__ import print_function
 
