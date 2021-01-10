@@ -207,6 +207,7 @@ RUN pip install -r requirements.txt && \
     pip install -U six && \
     pip install --upgrade --pre SimpleITK --find-links https://github.com/SimpleITK/SimpleITK/releases/tag/latest
 
+RUN ln -snf /bin/bash /bin/sh
 
 RUN source $BASHRC
 

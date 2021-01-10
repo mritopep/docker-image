@@ -5,7 +5,7 @@ curr_path = str(os.path.dirname(os.path.abspath(__file__))).replace("/scripts/pr
 preprocessed_data=str(os.path.dirname(os.path.abspath(__file__))).replace("/scripts/preprocess_script","/preprocesed_data/DATA")
 
 def image_registration(pet_image,mri_image):
-    os.system(f"python image_registation {pet_image} {mri_image}")
+    os.system(f"python image_registation {mri_image} {pet_image}")
 
 def intensity_normalization():
     pass

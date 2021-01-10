@@ -50,6 +50,7 @@ def extract(source,destination):
                 print(file.filename+"\n")
 
 def make_dir():
+    print("\nMAKING DIR\n")
     try:
         os.makedirs(DOWNLOAD)
         os.makedirs(EXTRACT)
@@ -58,10 +59,10 @@ def make_dir():
     except:
         pass
 
-def download_data():
+def download_data(name):  
     downloaded_files=[]
-    files=get_files()
-    files=files[:1]
+    files=get_files(name)
+    files=files[3:4]
     for fs in files:
         file_id=fs['id']
         file_path=DOWNLOAD+fs['name']
@@ -69,9 +70,10 @@ def download_data():
         download_file_from_google_drive(file_id, file_path)
         downloaded_files.append({"name":file_name,"path":file_path})
         print(f'name:{file_name} path: {file_path}')
+    print("\nDOWNLOADED FILES\n")
     return downloaded_files
 
-def extract_files(downloaded_files):
+def extract_files(downloaded_files): 
     extract_paths=[]
     for fs in downloaded_files:
       extract_path=EXTRACT+fs['name'][:-4]
@@ -79,6 +81,7 @@ def extract_files(downloaded_files):
       print(f'name:{fs["name"]} path: {extract_path}')
       os.remove(fs['path'])
       extract_paths.append(extract_path)
+    print("\nEXTRACTED FILES\n")
     return extract_paths
 
 def get_nii_files(extracted_paths):
@@ -91,18 +94,19 @@ def get_nii_files(extracted_paths):
                 file_path=os.path.join(r, file)
                 nii_files.append({"name":file_name,"path":file_path})
                 print(f'name:{file_name} path: {file_path}')
+    print("\nGOT NII FILE\n")
     return nii_files
 
-def get_data():
+def get_data(name):
     make_dir()
-    downloaded_files=download_data()
+    downloaded_files=download_data(name)
     extracted_paths=extract_files(downloaded_files)
     nii_files=get_nii_files(extracted_paths)
     return nii_files
 
 def main():
     print(curr_path)
-    # print(get_data())
+    print(get_data("adni_data"))
 
 
 if __name__ == "__main__":

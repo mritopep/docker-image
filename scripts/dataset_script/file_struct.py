@@ -15,7 +15,6 @@ CANCER=f'{curr_path}/DATA/CANCER/'
 EXTRACT=f'{curr_path}/EXTRACT/'
 
 def get_id_and_mod(name):
-  #ADNI DATASET
   mod=""
   if(name.find('_P') !=-1):
     mod="PT"
@@ -24,6 +23,7 @@ def get_id_and_mod(name):
     mod="MR"
     id_index=name.find('_M')
   sub_id=name[5:id_index]
+  print("\nGOT ID AND MOD\n")
   return [sub_id,mod]
 
 def make_dir(file_data):
@@ -35,17 +35,18 @@ def make_dir(file_data):
     except OSError as error:  
         print(error) 
   copyfile(file_data["path"], loc+"/"+file_data["name"])
+  print("\nMAKING STRUCTUREn")
   print(f"file copied :{loc}/{file_data['name']}")
 
-def make_struct():
-    files=get_data()
+def make_struct(name):
+    files=get_data(name)
     for f in files:
         make_dir(f)
     shutil.rmtree(EXTRACT) 
 
 def main():
     print(curr_path)
-    make_struct()
+    make_struct("adni_data")
 
 if __name__ == "__main__":
     main()

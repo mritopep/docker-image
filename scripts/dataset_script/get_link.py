@@ -34,31 +34,43 @@ def load_cred(name):
     else:
         print("token not found")
 
-def get_id(creds):
+def match_file_name(file_name,data_name):
+    if(file_name.find("metadata")!=-1 and data_name=="adni_metadata"):
+        return True
+    if(file_name.find("part")!=-1 and data_name=="adni_data" and file_name.find("metadata")==-1 ):
+        return True
+    if(file_name.find("CAN_META")!=-1 and data_name=="cancer_matadata"):
+        return True
+    if(file_name.find("CAN")!=-1 and data_name=="cancer_data"):
+        return True 
+    return False
+
+
+def get_id(creds,name):
     files = []
     service = build('drive', 'v3', credentials=creds)
     results = service.files().list(fields="nextPageToken, files(id, name)").execute()
     items = results.get('files', [])
     if items:
         for item in items:
-            if(item['name'].find(".zip")!=-1):
-                if(item['name'].find("metadata")==-1):
-                    print(u'{0} ({1})'.format(item['name'], item['id']))
-                    files.append(item)
+            if(match_file_name(item['name'],name)):
+                print(u'{0} ({1})'.format(item['name'], item['id']))
+                files.append(item)
     else:
         print("no files found")
+    print("\nGOT FILE IDS\n")
     return files
 
-def get_files():
+def get_files(name):
     files=[]
     for token in tokens:
         creds=load_cred(token)
-        files.extend(get_id(creds))
+        files.extend(get_id(creds,name))
     return files
     
 def main():
     print(curr_path)
-    print(get_files())
+    print(get_files("adni_data"))
     
     
 if __name__ == '__main__':
