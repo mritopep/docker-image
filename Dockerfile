@@ -47,26 +47,26 @@ COPY scripts/dataset_script/tokens/ $SCRIPT/dataset_script/tokens
 COPY scripts/preprocess_script/ $SCRIPT/preprocess_script/
 COPY scripts/requirements.txt $SCRIPT/
 
-#-------------------------------------------------------------------------------
-# PYTHON
-#-------------------------------------------------------------------------------
-ENV PYTHON_FULL_VERSION 3.8.0
-ENV PYTHON_VER 3.8
-WORKDIR $SOFT
-USER root
-RUN \
-    mkdir python && \
-    cd python && \
-    apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev wget curl && \
-    wget https://www.python.org/ftp/python/${PYTHON_FULL_VERSION}/Python-${PYTHON_FULL_VERSION}.tgz && \
-    tar -xf Python-${PYTHON_FULL_VERSION}.tgz && \
-    cd Python-${PYTHON_FULL_VERSION} && \
-    ./configure --enable-optimizations && \
-    make -j $N_CPUS && \
-    make altinstall && \
-    python${PYTHON_VER} -m pip install --upgrade pip && \
-    cd .. && \
-    rm -rf python
+# #-------------------------------------------------------------------------------
+# # PYTHON
+# #-------------------------------------------------------------------------------
+# ENV PYTHON_FULL_VERSION 3.8.0
+# ENV PYTHON_VER 3.8
+# WORKDIR $SOFT
+# USER root
+# RUN \
+#     mkdir python && \
+#     cd python && \
+#     apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev wget curl && \
+#     wget https://www.python.org/ftp/python/${PYTHON_FULL_VERSION}/Python-${PYTHON_FULL_VERSION}.tgz && \
+#     tar -xf Python-${PYTHON_FULL_VERSION}.tgz && \
+#     cd Python-${PYTHON_FULL_VERSION} && \
+#     ./configure --enable-optimizations && \
+#     make -j $N_CPUS && \
+#     make altinstall && \
+#     python${PYTHON_VER} -m pip install --upgrade pip && \
+#     cd .. && \
+#     rm -rf python
 
 #-------------------------------------------------------------------------------
 # ANTS 
