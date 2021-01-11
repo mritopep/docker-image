@@ -29,12 +29,11 @@ def make_dir():
 def get_xml_files(extracted_paths):
     xml_files=[]
     for extract_path in extracted_paths:
-        files = [f for f in listdir(extract_path) if isfile(join(extract_path, f))]
-        print(files)
-        for file in files:
-            if file.endswith(".xml"):
+      for r, d, f in os.walk(extract_path):
+          for file in f:
+              if file.endswith(".xml") and file.startswith("ADNI"):
                 file_name=file
-                file_path=os.path.join(extract_path, file)
+                file_path=os.path.join(r, file)
                 xml_files.append({"name":file_name,"path":file_path})
                 print(f'name:{file_name} path: {file_path}')
     print("\nGOT XML FILE\n")

@@ -1,0 +1,41 @@
+# ENV PETPVC_GIT=https://github.com/UCL/PETPVC.git
+# WORKDIR $SOFT
+# RUN \
+#     mkdir petpvc && \
+#     cd petpvc && \
+#     workingDir=${PWD} && \
+#     git clone ${PETPVC_GIT} PETPVC && \
+#     mkdir build install && \
+#     cd build && \
+#     cmake \
+#     -DCMAKE_INSTALL_PREFIX=${workingDir}/install \
+#     -DITK_DIR=/work/soft/ants/build/staging/include/ITK-5.2 \
+#           ../PETPVC && \
+#     make -j $N_CPUS 2>&1 | tee build.log  && \
+#     make install 2>&1 | tee install.log
+# RUN \
+#     echo "export PETPVC=$SOFT/petpvc/build/bin" >> $BASHRC && \
+#     export PATH=$PATH:PETPVC >> $BASHRC
+
+    # pip install -U six && \
+
+# #-------------------------------------------------------------------------------
+# # PYTHON
+# #-------------------------------------------------------------------------------
+# ENV PYTHON_FULL_VERSION 3.8.0
+# ENV PYTHON_VER 3.8
+# WORKDIR $SOFT
+# USER root
+# RUN \
+#     mkdir python && \
+#     cd python && \
+#     apt-get -y install build-essential zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev wget libbz2-dev wget curl && \
+#     wget https://www.python.org/ftp/python/${PYTHON_FULL_VERSION}/Python-${PYTHON_FULL_VERSION}.tgz && \
+#     tar -xf Python-${PYTHON_FULL_VERSION}.tgz && \
+#     cd Python-${PYTHON_FULL_VERSION} && \
+#     ./configure --enable-optimizations && \
+#     make -j $N_CPUS && \
+#     make altinstall && \
+#     python${PYTHON_VER} -m pip install --upgrade pip && \
+#     cd .. && \
+#     rm -rf python
