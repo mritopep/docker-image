@@ -61,16 +61,15 @@ RUN \
   conda config --add channels conda-forge && \
   conda init bash && \
   export PATH="$PATH" && \ 
-  exec bash && \ 
-  conda create --name skull_strip -y && \
-  conda activate skull_strip && \
-  conda install -y --no-deps \
-  -c anaconda pip && \
-  export PATH="$PATH" && \ 
-  exec bash && \ 
+  exec bash  
 RUN \
     export MINICONDA=$HOME/miniconda/bin && \
     export PATH=$PATH:$MINICONDA
+RUN \
+  conda create --name skull_strip -y && \
+  activate skull_strip && \
+  conda install -y --no-deps \
+  -c anaconda pip
 
 #-------------------------------------------------------------------------------
 # ANTS 
@@ -130,10 +129,9 @@ RUN chmod +x $SOFT/skull_strip/skull_strip.py
 RUN \
     export SKULL_STRIP_PATH=$SOFT/skull_strip && \
     export PATH=$PATH:$SKULL_STRIP_PATH
-RUN conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
-    conda activate
+RUN \
+    activate base && \
+    conda info --envs
 
 #-------------------------------------------------------------------------------
 # INTENSITY NORMALIZATION
@@ -141,15 +139,11 @@ RUN conda init bash && \
 ENV NORMALIZATION_GIT=https://github.com/jcreinhold/intensity-normalization
 WORKDIR $SOFT
 RUN \
-    conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
     conda create --name intensity_normailzation -y && \
-    conda activate intensity_normailzation && \
+    activate intensity_normailzation && \
     conda install -y --no-deps \
-    -c anaconda pip && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
+    -c anaconda pip 
+RUN \
     git clone ${NORMALIZATION_GIT} intensity_normailzation && \
     cd intensity_normailzation && \
     python setup.py install && \
@@ -157,25 +151,20 @@ RUN \
 RUN \
     export NORMALIZATION_PATH=$SOFT/intensity_normailzation && \
     export PATH=$PATH:$NORMALIZATION_PATH
-RUN conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
-    conda activate
+RUN \
+    activate base && \
+    conda info --envs
 
 #-------------------------------------------------------------------------------
 # BIAS FIELD CORRECTION
 #-------------------------------------------------------------------------------
 WORKDIR $SOFT
-RUN \
-    conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
+RUN \ 
     conda create --name simple_itk -y && \
-    conda activate simple_itk && \
+    activate simple_itk && \
     conda install -y --no-deps \
-    -c anaconda pip && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
+    -c anaconda pip 
+RUN \
     pip install --upgrade --pre SimpleITK --find-links https://github.com/SimpleITK/SimpleITK/releases/tag/latest && \
     mkdir bias_correction 
 COPY scripts/soft/bias_field_correction.py $SOFT/bias_correction/
@@ -197,10 +186,9 @@ RUN chmod +x $SOFT/image_registration/image_rgr.py
 RUN \
     export IMAGE_REG_PATH=$SOFT/image_registration && \
     export PATH=$PATH:$IMAGE_REG_PATH
-RUN conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
-    conda activate
+RUN \
+    activate base && \
+    conda info --envs
 
 #-------------------------------------------------------------------------------
 # PETPVC
@@ -208,23 +196,16 @@ RUN conda init bash && \
 ENV PATH="$HOME/miniconda/bin:$PATH"
 WORKDIR $SOFT
 RUN \
-    conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
     conda create --name petpvc -y && \
-    conda activate petpvc && \
+    activate petpvc && \
     conda install -y --no-deps \
-    -c anaconda pip \
-    -c aramislab petpvc && \ 
-    export PATH="$PATH" && \ 
-    exec bash && \ 
+    -c aramislab petpvc
 RUN \
     export MINICONDA=$HOME/miniconda/bin && \
     export PATH=$PATH:$MINICONDA
-RUN conda init bash && \
-    export PATH="$PATH" && \ 
-    exec bash && \ 
-    conda activate
+RUN \
+    activate base && \
+    conda info --envs
 
 #-------------------------------------------------------------------------------
 # DATASET
