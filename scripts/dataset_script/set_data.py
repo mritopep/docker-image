@@ -59,17 +59,22 @@ def make_dir():
     except:
         pass
 
+def download_lock(files):
+    for file in files:
+        if(file['name'].find("part1")!=-1):
+            return [file]
+
 def download_data(name):  
     downloaded_files=[]
     files=get_files(name)
-    files=files[:1]
+    files=download_lock(files)
     for fs in files:
         file_id=fs['id']
         file_path=DOWNLOAD+fs['name']
         file_name=fs['name']
-        download_file_from_google_drive(file_id, file_path)
-        downloaded_files.append({"name":file_name,"path":file_path})
         print(f'name:{file_name} path: {file_path}')
+        download_file_from_google_drive(file_id, file_path)
+        downloaded_files.append({"name":file_name,"path":file_path})    
     print("\nDOWNLOADED FILES\n")
     return downloaded_files
 
