@@ -1,4 +1,6 @@
-#!/work/miniconda/bin/python
+import SimpleITK as sitk
+import os
+import sys
 
 import SimpleITK as sitk
 import os
@@ -9,7 +11,7 @@ if len(sys.argv)<3:
 	exit()
 	
 path = ""
-if len(sys.argv) == 4: path = sys.argv[3]
+if len(sys.argv) == 4: path = sys.argv[3] + '/'
 
 fixed_image = sitk.ReadImage(sys.argv[1], sitk.sitkFloat32)
 moving_image = sitk.ReadImage(sys.argv[2], sitk.sitkFloat32) 
@@ -62,4 +64,4 @@ print('Optimizer\'s stopping condition, {0}'.format(registration_method.GetOptim
 
 moving_resampled = sitk.Resample(moving_image, fixed_image, final_transform, sitk.sitkLinear, 0.0, moving_image.GetPixelID())
 
-sitk.WriteImage(moving_resampled, os.path.join(path + "/" + sys.argv[2] + "_registered.nii"))
+sitk.WriteImage(moving_resampled, os.path.join(path + sys.argv[2][:-4] + "_registered.nii"))

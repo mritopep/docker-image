@@ -38,14 +38,12 @@ RUN mkdir $HOME && \
     mkdir $DOWNLOAD && \
     mkdir $SOFT
 
-RUN mkdir ${SCRIPT}/dataset_script && \
-    mkdir ${SCRIPT}/dataset_script/tokens && \
-    mkdir ${SCRIPT}/preprocess_script 
+RUN \
+    mkdir $HOME/tokens && \
+    mkdir $HOME/sample
 
-COPY scripts/dataset_script/ $SCRIPT/dataset_script/
-COPY scripts/dataset_script/tokens/ $SCRIPT/dataset_script/tokens
-COPY scripts/preprocess_script/ $SCRIPT/preprocess_script/
-COPY scripts/requirements.txt $SCRIPT/
+COPY scripts/tokens/ $HOME/tokens
+COPY scripts/sample/ $HOME/sample
 
 #-------------------------------------------------------------------------------
 # MINICONDA
@@ -59,12 +57,15 @@ RUN \
   rm miniconda.sh && \
   conda update -y python conda && \
   conda config --add channels conda-forge && \
+  conda install -y --no-deps \
+  -c anaconda pip && \
   conda init bash && \
   export PATH="$PATH" && \ 
   exec bash  
-RUN \
-    export MINICONDA=$HOME/miniconda/bin && \
-    export PATH=$PATH:$MINICONDA
+
+ENV MINICONDA="$HOME/miniconda/bin"
+ENV PATH="${PATH}:${MINICONDA}"
+
 RUN \
   conda create --name skull_strip -y && \
   activate skull_strip && \
@@ -89,9 +90,9 @@ RUN \
     make -j $N_CPUS 2>&1 | tee build.log  && \
     cd ANTS-build && \
     make install 2>&1 | tee install.log
-RUN \
-    export ANTSPATH=$SOFT/ants/install/bin && \
-    export PATH=$PATH:$ANTSPATH
+
+ENV ANTSPATH="$SOFT/ants/install/bin"
+ENV PATH="${PATH}:${ANTSPATH}"
 
 #-------------------------------------------------------------------------------
 # NIFTYREG 
@@ -110,10 +111,10 @@ RUN \
           ../NIFTYREG && \
     make -j $N_CPUS 2>&1 | tee build.log  && \
     make install 2>&1 | tee install.log
-RUN \
-    export NIFTYREG=$SOFT/nifty_reg/install/bin && \
-    export PATH=$PATH:$NIFTYREG && \
-    export LD_LIBRARY_PATH=$SOFT/nifty_reg/install/lib
+
+ENV LD_LIBRARY_PATH="$SOFT/nifty_reg/install/lib"
+ENV NIFTYREG="$SOFT/nifty_reg/install/bin"
+ENV PATH="${PATH}:${NIFTYREG}"
 
 #-------------------------------------------------------------------------------
 # SKULL STRIP
@@ -125,32 +126,35 @@ RUN \
     cd skull_strip && \
     pip install -r requirements.txt
 COPY scripts/soft/skull_strip.py $SOFT/skull_strip/
-RUN chmod +x $SOFT/skull_strip/skull_strip.py
-RUN \
-    export SKULL_STRIP_PATH=$SOFT/skull_strip && \
-    export PATH=$PATH:$SKULL_STRIP_PATH
+RUN chmod +x $SOFT/skull_strip/s3.py
+
+ENV SKULL_STRIP_PATH="$SOFT/skull_strip"
+ENV PATH="${PATH}:${SKULL_STRIP_PATH}"
+
 RUN \
     activate base && \
     conda info --envs
 
 #-------------------------------------------------------------------------------
-# INTENSITY NORMALIZATION
+# DENOISE
 #-------------------------------------------------------------------------------
-ENV NORMALIZATION_GIT=https://github.com/jcreinhold/intensity-normalization
 WORKDIR $SOFT
 RUN \
-    conda create --name intensity_normailzation -y && \
-    activate intensity_normailzation && \
+    conda create --name denoise -y && \
+    activate denoise && \
     conda install -y --no-deps \
     -c anaconda pip 
-RUN \
-    git clone ${NORMALIZATION_GIT} intensity_normailzation && \
-    cd intensity_normailzation && \
-    python setup.py install && \
-    pip install -r requirements.txt
-RUN \
-    export NORMALIZATION_PATH=$SOFT/intensity_normailzation && \
-    export PATH=$PATH:$NORMALIZATION_PATH
+RUN mkdir denoise
+COPY scripts/soft/denoise.py $SOFT/denoise/
+RUN pip install \
+    numpy \
+    nibabel \
+    scipy
+RUN chmod +x $SOFT/denoise/denoise.py
+
+ENV DENOISE_PATH="$SOFT/denoise"
+ENV PATH="${PATH}:${DENOISE_PATH}"
+
 RUN \
     activate base && \
     conda info --envs
@@ -170,9 +174,9 @@ RUN \
 COPY scripts/soft/bias_field_correction.py $SOFT/bias_correction/
 USER root
 RUN chmod +x $SOFT/bias_correction/bias_field_correction.py
-RUN \
-    export BIAS_CORRECTION_PATH=$SOFT/bias_correction && \
-    export PATH=$PATH:$BIAS_CORRECTION_PATH
+
+ENV BIAS_CORRECTION_PATH="$SOFT/bias_correction"
+ENV PATH="${PATH}:${BIAS_CORRECTION_PATH}"
 
 #-------------------------------------------------------------------------------
 # IMAGE REGISTRATION
@@ -183,9 +187,10 @@ RUN \
 COPY scripts/soft/image_rgr.py $SOFT/image_registration/
 USER root
 RUN chmod +x $SOFT/image_registration/image_rgr.py
-RUN \
-    export IMAGE_REG_PATH=$SOFT/image_registration && \
-    export PATH=$PATH:$IMAGE_REG_PATH
+
+ENV IMAGE_REG_PATH="$SOFT/image_registration"
+ENV PATH="${PATH}:${IMAGE_REG_PATH}"
+
 RUN \
     activate base && \
     conda info --envs
@@ -201,9 +206,6 @@ RUN \
     conda install -y --no-deps \
     -c aramislab petpvc
 RUN \
-    export MINICONDA=$HOME/miniconda/bin && \
-    export PATH=$PATH:$MINICONDA
-RUN \
     activate base && \
     conda info --envs
 
@@ -211,8 +213,10 @@ RUN \
 # DATASET
 #-------------------------------------------------------------------------------
 WORKDIR $SCRIPT
-RUN pip install -r requirements.txt 
-RUN conda info --envs
+RUN \
+    git clone https://github.com/mritopep/scripts.git . && \
+    pip install -r requirements.txt && \
+    conda info --envs
 
 CMD ["bash"]
 

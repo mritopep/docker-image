@@ -39,3 +39,25 @@
 #     python${PYTHON_VER} -m pip install --upgrade pip && \
 #     cd .. && \
 #     rm -rf python
+
+#-------------------------------------------------------------------------------
+# INTENSITY NORMALIZATION
+#-------------------------------------------------------------------------------
+ENV NORMALIZATION_GIT=https://github.com/jcreinhold/intensity-normalization
+WORKDIR $SOFT
+RUN \
+    conda create --name intensity_normailzation -y && \
+    activate intensity_normailzation && \
+    conda install -y --no-deps \
+    -c anaconda pip 
+RUN \
+    git clone ${NORMALIZATION_GIT} intensity_normailzation && \
+    cd intensity_normailzation && \
+    python setup.py install && \
+    pip install -r requirements.txt
+RUN \
+    export NORMALIZATION_PATH=$SOFT/intensity_normailzation && \
+    export PATH=$PATH:$NORMALIZATION_PATH
+RUN \
+    activate base && \
+    conda info --envs
