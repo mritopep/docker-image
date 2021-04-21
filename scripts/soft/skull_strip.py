@@ -1,3 +1,4 @@
+#!/work/miniconda/bin/python
 from src.skull import SkullStripper
 from src import helpers as utils
 import os

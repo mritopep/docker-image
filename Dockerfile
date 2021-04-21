@@ -18,7 +18,8 @@ RUN \
     zlib1g-dev \
     cmake \
     git \
-    wget
+    wget \
+    nano
 
 # Set environment
 ENV LC_ALL en_US.UTF-8
@@ -126,7 +127,7 @@ RUN \
     cd skull_strip && \
     pip install -r requirements.txt
 COPY scripts/soft/skull_strip.py $SOFT/skull_strip/
-RUN chmod +x $SOFT/skull_strip/s3.py
+RUN chmod +x $SOFT/skull_strip/skull_strip.py
 
 ENV SKULL_STRIP_PATH="$SOFT/skull_strip"
 ENV PATH="${PATH}:${SKULL_STRIP_PATH}"

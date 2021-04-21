@@ -1,3 +1,4 @@
+#!/work/miniconda/bin/python
 import numpy as np
 import nibabel
 from scipy import ndimage
@@ -14,7 +15,7 @@ img_file = ""
 opts, _ = getopt.getopt(sys.argv[1:], "i:o:s:") 
 for inp, arg in opts :
 	if inp == '-i' : img_file = arg
-	elif inp == '-o' : path = arg + '/'
+	elif inp == '-o' : path = arg 
 	elif inp == "-s" : denoise_strength = int(arg)
 	
 if img_file == "" : 
@@ -30,4 +31,4 @@ for i in range(slices):
     data_filtered[:,:,i,0] = ndimage.median_filter(data[:,:,i,0], denoise_strength)
 
 new_image = nibabel.Nifti1Image(data_filtered, affine=np.eye(4))
-nibabel.save(new_image, path + img_file[:-4] + '_filtered.nii')
+nibabel.save(new_image, path)
